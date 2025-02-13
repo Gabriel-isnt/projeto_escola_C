@@ -1,166 +1,215 @@
-/*
-
-  EU AINDA TENHO QUE ARRUMAR TODAS AS FUNÇÕES
-
-  SE ESSE CÓDIGO FOR RODADO ELE VAI DAR UM ERRO
-
-  Depois que eu fiz aquele arquivo de funções pra ter uma noção melhor de como pegar os dados do txt
-  eu comecei a alterar a struct No e a criar a struct Dado
-
-  As funções TODAS aqui estão adaptadas para a struct No receber como um dado um int, não uma struct
-
-*/
-
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <windows.h>
 
-#define NAME_SIZE 100
-#define SALARY     10
+#define NAME_SIZE  101
+#define SEX_INDEX  100
+#define MAX_SIZE   112
+#define SALARY_SIZE 10
 
-// corrige com carinho fessor 😳
-typedef struct {  // tenho que arrumar o restante das funções pra conseguir parear com essa
+// corrija sempre com muito amor e carinho professor     😳
+//                                                      👉👈
+
+
+// código é nosso, logo, organizo ele da forma que EU QUERO >:(
+
+
+typedef struct {
 
         char nome[NAME_SIZE];
         char sexo;
-        float salario;
+        double salario;
 
 } Dado;
 
-typedef struct No {
 
-        struct Dado* dados;
+typedef struct No{
 
+        Dado* infos;
+
+        struct No* proximo;
         struct No* anterior;
-        struct No* proximo;        
-
+        
 } No;
 
 typedef struct {
 
-        struct No* comeco;
-        struct No* fim;
-
-} Lista; 
-
-
-Lista* criaLista(){
-        Lista* lista = (Lista*)malloc(sizeof(Lista));
-
-        if(lista == NULL){
-                puts("erro ao criar a lista");
-                return NULL;
-        }
-
-        lista->comeco = NULL;
-        lista->fim = NULL;
-
-        return lista;
-}
-
-
-void deletaLista(Lista* lista){
-
-        No* att = lista->comeco;
-
-        while(att != NULL){
-                No* aux = att; 
-                att = att->proximo;
-                free(aux);
-        }
-
-        free(lista);
-
-        puts("lista liberada da memoria");
-}
-
-
-void adicionaDado(Lista* lista, Dado* dado){
-        No* novo = (No*)malloc(sizeof(No));
-
-        if(novo == NULL){
-                puts("erro ao criar o nó da lista");
-                return;
-        }
-
-        novo->info = dado;
-        novo->proximo = NULL;
-
-        if(lista->comeco == NULL){
-                lista->comeco = novo;
-                lista->fim = novo;
-
-                novo->anterior = NULL;
-
-                return;
-        }
-
-        // o "fim" é onde será appendado 
-        No* att = lista->fim;
-
-        att->proximo = novo;
-        novo->anterior = att;
-        lista->fim = novo;
-}
-
-
-void mostraListaVai(Lista* lista){
-
-        No* att = lista->comeco;
-
-        while(att != NULL){
-                printf("%d \n", att->info);
-
-                att = att->proximo;
-        }
-
-        printf("\n");
-}
-
-
-void mostraListaVolta(Lista* lista){
-
-        No* att = lista->fim;
-
-        while(att != NULL){
-                printf("%d \n", att->info);
-
-                att = att->anterior;
-        }
-
-        printf("\n");
-}
-
-
-int main(){
+        No* comeco;
+        No* fim;
         
-        // fazendo o terminal reconhecer utf8 direito
+} Fila;
+
+
+
+void pegaSexo(char* linha, char* sexo){
+
+        *sexo = linha[SEX_INDEX];
+}
+
+void pegaNome(char* linha, char* nome){
+
+        int a;
+        for(a = 0; a < NAME_SIZE - 1; a++){
+                nome[a] = linha[a];
+        }
+
+        nome[a] = '\0';
+}
+
+void pegaSalario(char* linha, double* salario) {
+
+        char salarioChar[SALARY_SIZE];
+        int b = 0;
+        
+        for (int a = 101; a < 101 + 9; a++) {
+            salarioChar[b] = linha[a];
+            b++;
+        }
+        
+        salarioChar[b] = '\0';
+
+        *salario = atof(salarioChar);
+}
+
+
+void insereDados(Fila* fila, char* linha){
+
+        // inicialização das structs novas
+        No* novoNo     = (No*)malloc(sizeof(No));
+        Dado* novoDado = (Dado*)malloc(sizeof(Dado));
+
+        if(novoNo == NULL || novoDado == NULL){
+                puts("problema na criação de dados para a fila");
+
+                return;
+        }
+
+        // aplicação da lógica
+
+        // colocando valores em novoDado
+        pegaSexo(linha, &novoDado->sexo);
+        pegaNome(linha, novoDado->nome);
+        pegaSalario(linha, &novoDado->salario);
+        
+        // ligando o Nó com os dados passados
+        novoNo->infos   = novoDado;
+        novoNo->proximo = NULL;
+
+        // ligando o nó criado à lista
+        if(fila->comeco == NULL){
+                fila->comeco = novoNo;
+                fila->fim    = novoNo;
+                
+                novoNo->anterior = NULL;
+        
+        } else {
+                
+                novoNo->anterior = fila->fim;
+                
+                fila->fim->proximo = novoNo;
+                fila->fim          = novoNo;
+        }
+}
+
+void mostraFilaIda(Fila* fila){
+
+        // peguei o nó inicial
+        No* att = fila->comeco;
+
+        puts("------------------------------------------------------------");        
+        while(att != NULL){
+
+                printf("Nome: %s \n", att->infos->nome);
+                printf("Sexo: %c \n", att->infos->sexo);
+                printf("Salario: %.2f \n", att->infos->salario);
+                puts("------------------------------------------------------------");
+                
+                att = att->proximo;
+        }
+
+        printf("\n");
+}
+
+
+Fila* criaFila(){
+
+        Fila* fila = (Fila*)malloc(sizeof(Fila));
+
+        fila->comeco = NULL;
+        fila->fim    = NULL;
+
+        return fila;
+}
+
+
+void ordenaFila(Fila* fila){  // tô usando bubble sort
+        // ain mas é ruim em performance
+        // NON ME INTERESSA 😎😎🔥🔥😎😎🔥🔥😎😎🔥🔥😎😎🔥🔥😎😎
+
+        // strcmp(1, 2) compara pra ver qual é antes no alfabeto
+        // 0 se são iguais; negativo se a primeira; positivo se a segunda
+
+        int trocado;
+
+        No* temp;
+        No* att; 
+
+        do{
+                trocado = 0;
+
+                att = fila->comeco;
+                
+
+                while(att->proximo != NULL){
+                        
+                        if(strcmp(att->infos->nome, att->proximo->infos->nome) > 0){
+                                
+                                Dado* temp = att->infos;
+                                
+                                att->infos = att->proximo->infos;
+                                
+                                att->proximo->infos = temp;
+                                
+                                trocado = 1;
+                        }
+
+                        att = att->proximo;
+                }
+
+        } while(trocado);
+
+}
+
+
+// sempre com um bom uso de comentários dentro do código :D
+int main(){
+
+        // formatar o console windows para conseguir mostrar utf8 normalmente
         SetConsoleOutputCP(CP_UTF8);
 
-        // criação da lista
-        Lista* lista = criaLista();
+        // inicialização
+        Fila* fila = criaFila();
 
-        // adicionando dados
-        adicionaDado(lista, 3);
-        adicionaDado(lista, 5);
-        adicionaDado(lista, 7);
-        adicionaDado(lista, 9);
-        adicionaDado(lista, 6);
-        adicionaDado(lista, 1);
-        adicionaDado(lista, 2);
-        adicionaDado(lista, 4);
+        FILE* arquivo = fopen("entrada.txt", "r");
 
-        // mostrando a lista
-        mostraListaVai(lista);
-        mostraListaVolta(lista);
+        char linha[MAX_SIZE];
 
-        // libera a lista criada junto com seus dados
-        deletaLista(lista);
+        // implementação
+        while(fgets(linha, MAX_SIZE, arquivo) != NULL){
+                
 
-        // só testando pra ser se a lista foi apagada mesmo
-        mostraListaVai(lista);
+                if(linha[strlen(linha) - 1] == '\n'){
+                        linha[strlen(linha) - 1] = '\0';
+                }
+
+                insereDados(fila, linha);
+        }
+
+
+        ordenaFila(fila);
+
+        mostraFilaIda(fila);
 
         return 0;
 }
-
