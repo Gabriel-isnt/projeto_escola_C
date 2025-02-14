@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <windows.h>
+#include <locale.h>
 
 #define NAME_SIZE  101
 #define SEX_INDEX  100
@@ -47,6 +48,7 @@ void pegaSexo(char* linha, char* sexo){
         *sexo = linha[SEX_INDEX];
 }
 
+
 void pegaNome(char* linha, char* nome){
 
         int a;
@@ -56,6 +58,7 @@ void pegaNome(char* linha, char* nome){
 
         nome[a] = '\0';
 }
+
 
 void pegaSalario(char* linha, double* salario) {
 
@@ -112,6 +115,7 @@ void insereDados(Fila* fila, char* linha){
         }
 }
 
+
 void mostraFilaIda(Fila* fila){
 
         // peguei o nó inicial
@@ -132,6 +136,26 @@ void mostraFilaIda(Fila* fila){
 }
 
 
+void mostraFilaVolta(Fila* fila){
+
+        No* att = fila->fim;
+        
+        puts("------------------------------------------------------------");        
+        while(att != NULL){
+
+                printf("Nome: %s \n", att->infos->nome);
+                printf("Sexo: %c \n", att->infos->sexo);
+                printf("Salario: %.2f \n", att->infos->salario);
+                puts("------------------------------------------------------------");
+ 
+                att = att->anterior;
+        }
+
+        printf("\n");
+        
+}
+
+
 Fila* criaFila(){
 
         Fila* fila = (Fila*)malloc(sizeof(Fila));
@@ -143,7 +167,7 @@ Fila* criaFila(){
 }
 
 
-void ordenaFila(Fila* fila){  // tô usando bubble sort
+void ordenaFila(Fila* fila){  // tô usando bubble sort com aquela flag de mudança
         // ain mas é ruim em performance
         // NON ME INTERESSA 😎😎🔥🔥😎😎🔥🔥😎😎🔥🔥😎😎🔥🔥😎😎
 
@@ -152,7 +176,6 @@ void ordenaFila(Fila* fila){  // tô usando bubble sort
 
         int trocado;
 
-        No* temp;
         No* att; 
 
         do{
@@ -182,11 +205,15 @@ void ordenaFila(Fila* fila){  // tô usando bubble sort
 }
 
 
+
+
+
 // sempre com um bom uso de comentários dentro do código :D
 int main(){
 
         // formatar o console windows para conseguir mostrar utf8 normalmente
         SetConsoleOutputCP(CP_UTF8);
+        setlocale(LC_ALL, "pt_BR.UTF-8");
 
         // inicialização
         Fila* fila = criaFila();
@@ -198,9 +225,12 @@ int main(){
         // implementação
         while(fgets(linha, MAX_SIZE, arquivo) != NULL){
                 
-
                 if(linha[strlen(linha) - 1] == '\n'){
                         linha[strlen(linha) - 1] = '\0';
+                }
+
+                if(linha[0] == '\0'){  // por algum motivo ficava printando uma linha inicial sem ninguém
+                        continue;
                 }
 
                 insereDados(fila, linha);
@@ -209,7 +239,8 @@ int main(){
 
         ordenaFila(fila);
 
-        mostraFilaIda(fila);
+        //mostraFilaIda(fila);
+        mostraFilaVolta(fila);
 
         return 0;
 }
