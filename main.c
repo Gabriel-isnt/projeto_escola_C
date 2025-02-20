@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <windows.h>
 #include <locale.h>
 
 #define NAME_SIZE  101
@@ -182,7 +181,6 @@ void ordenaFila(Fila* fila){  // tô usando bubble sort com aquela flag de mudan
                 trocado = 0;
 
                 att = fila->comeco;
-                
 
                 while(att->proximo != NULL){
                         
@@ -205,14 +203,34 @@ void ordenaFila(Fila* fila){  // tô usando bubble sort com aquela flag de mudan
 }
 
 
+void limpaBuffer(){
+        char c;
+        while((c = getchar()) != '\n' && c != EOF);
+}
 
+
+int mostraOpcoes(){
+        
+        int escolha;
+        
+        do{     
+                puts("escolha uma das opcoes possiveis");
+                int res = scanf("%d", &escolha);
+                
+                if(!res){
+                        limpaBuffer();
+                        continue;
+                }
+                
+        } while(escolha != 1 && escolha != 2 && escolha != 0);
+        
+        return escolha;
+}
 
 
 // sempre com um bom uso de comentários dentro do código :D
 int main(){
 
-        // formatar o console windows para conseguir mostrar utf8 normalmente
-        SetConsoleOutputCP(CP_UTF8);
         setlocale(LC_ALL, "pt_BR.UTF-8");
 
         // inicialização
@@ -222,6 +240,8 @@ int main(){
 
         char linha[MAX_SIZE];
 
+        int escolha;
+        
         // implementação
         while(fgets(linha, MAX_SIZE, arquivo) != NULL){
                 
@@ -238,9 +258,27 @@ int main(){
 
 
         ordenaFila(fila);
-
-        //mostraFilaIda(fila);
-        mostraFilaVolta(fila);
+        
+        
+        while(1){
+                puts("escolha 1 para mostrar em ordem crescente (a..z)");
+                puts("escolha 2 para mostrar em ordem decrescente (z..a)");
+                puts("escolha 0 para terminar o programa (ele sentirá sua falta");
+                
+                escolha = mostraOpcoes();
+                
+                if(escolha == 1){
+                        mostraFilaIda(fila);
+                        
+                } else if(escolha == 2){
+                        mostraFilaVolta(fila);
+                        
+                } else {
+                        puts("adeus 😥");
+                        break;
+                }
+        }
+        
 
         return 0;
 }
