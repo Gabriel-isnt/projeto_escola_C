@@ -263,7 +263,7 @@ int main(){
         while(1){
                 puts("escolha 1 para mostrar em ordem crescente (a..z)");
                 puts("escolha 2 para mostrar em ordem decrescente (z..a)");
-                puts("escolha 0 para terminar o programa (ele sentirá sua falta");
+                puts("escolha 0 para terminar o programa (ele sentirá sua falta 😭)");
                 
                 escolha = mostraOpcoes();
                 
